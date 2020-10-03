@@ -5,20 +5,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/malczuuu/rmqbe/internal/controller"
-
+	"github.com/gorilla/mux"
 	"github.com/malczuuu/rmqbe/internal/auth"
+	"github.com/malczuuu/rmqbe/internal/config"
+	"github.com/malczuuu/rmqbe/internal/controller"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{PrettyPrint: true})
+	log.SetLevel(log.DebugLevel)
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	config := config.ReadConfig()
+
+	client, err := mongo.NewClient(options.Client().ApplyURI(config.MongoURI))
 	if err != nil {
 		panic(err)
 	}
@@ -30,12 +32,12 @@ func main() {
 		panic(err)
 	}
 
-	client.Database("rmqbe").CreateCollection(ctx, "rmqbe")
+	client.Database(config.MongoDatabase).CreateCollection(ctx, config.MongoUsersCollection)
 
-	authManager := auth.NewAuthManager(client)
+	auth := auth.NewRabbitAuthService(client, config)
 
 	homeController := controller.NewHomeController()
-	authController := controller.NewAuthController(authManager)
+	authController := controller.NewAuthController(auth)
 
 	addr := "0.0.0.0:8000"
 

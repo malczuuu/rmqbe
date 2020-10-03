@@ -7,19 +7,19 @@ import (
 	"github.com/malczuuu/rmqbe/internal/auth"
 )
 
-func NewAuthController(authManager auth.AuthManager) AuthController {
-	return AuthController{authManager: authManager}
+func NewAuthController(rabbitAuthService auth.RabbitAuthService) AuthController {
+	return AuthController{rabbitAuthService: rabbitAuthService}
 }
 
 type AuthController struct {
-	authManager auth.AuthManager
+	rabbitAuthService auth.RabbitAuthService
 }
 
 func (c *AuthController) User(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	auth := c.authManager.User(username, password)
+	auth := c.rabbitAuthService.User(username, password)
 
 	result := "deny"
 	if auth {
@@ -35,7 +35,7 @@ func (c *AuthController) Vhost(w http.ResponseWriter, r *http.Request) {
 	vhost := r.FormValue("vhost")
 	ip := r.FormValue("ip")
 
-	auth := c.authManager.Vhost(username, vhost, ip)
+	auth := c.rabbitAuthService.Vhost(username, vhost, ip)
 
 	result := "deny"
 	if auth {
@@ -53,7 +53,7 @@ func (c *AuthController) Resource(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	permission := r.FormValue("permission")
 
-	auth := c.authManager.Resource(username, vhost, resource, name, permission)
+	auth := c.rabbitAuthService.Resource(username, vhost, resource, name, permission)
 
 	result := "deny"
 	if auth {
@@ -72,7 +72,7 @@ func (c *AuthController) Topic(w http.ResponseWriter, r *http.Request) {
 	permission := r.FormValue("permission")
 	routingKey := r.FormValue("routing_key")
 
-	auth := c.authManager.Topic(username, vhost, resource, name, permission, routingKey)
+	auth := c.rabbitAuthService.Topic(username, vhost, resource, name, permission, routingKey)
 
 	result := "deny"
 	if auth {
