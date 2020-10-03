@@ -20,6 +20,8 @@ func main() {
 
 	config := config.ReadConfig()
 
+	log.WithField("config", config).Info("Starting RMQ BE")
+
 	client, err := mongo.NewClient(options.Client().ApplyURI(config.MongoURI))
 	if err != nil {
 		panic(err)
