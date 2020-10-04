@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"strings"
+
 	"github.com/malczuuu/rmqbe/internal/config"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,15 +28,10 @@ func (a *RabbitAuthService) User(username string, password string) bool {
 
 	entity := bson.M{}
 	query := bson.M{"username": username}
-	err := a.database.Collection("users").FindOne(nil, query).Decode(&entity)
+	err := a.database.Collection(a.collectionName).FindOne(nil, query).Decode(&entity)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"username": username,
-			"query":    query,
-		}).WithError(err).Debug("An error while retrieving user by username")
-		if err != mongo.ErrNoDocuments {
-			log.WithField("username", username).WithError(err).Error("Failed to authenticate user by password")
-		}
+		message := "An error while retrieving user by username"
+		a.logMongoFailure(err, query, message)
 		result = false
 	} else if entity["password"] == password {
 		result = true
@@ -48,18 +45,25 @@ func (a *RabbitAuthService) User(username string, password string) bool {
 	return result
 }
 
+func (a *RabbitAuthService) logMongoFailure(err error, query bson.M, message string) {
+	preparedLog := log.WithFields(log.Fields{"query": query, "collection": a.collectionName}).WithError(err)
+	if err == mongo.ErrNoDocuments {
+		preparedLog.Debug(message)
+	} else {
+		preparedLog.Error(message)
+	}
+}
+
 // Vhost checks whether requested user is a member of desired virtual host.
 func (a *RabbitAuthService) Vhost(username string, vhost string, ip string) bool {
 	result := true
 
 	entity := bson.M{}
 	query := bson.M{"username": username, "vhosts": vhost}
-	err := a.database.Collection("users").FindOne(nil, query).Decode(&entity)
+	err := a.database.Collection(a.collectionName).FindOne(nil, query).Decode(&entity)
 	if err != nil {
-		log.WithField("query", query).WithError(err).Debug("An error while retrieving user by username and vhost")
-		if err != mongo.ErrNoDocuments {
-			log.WithError(err).Error("Failed to authorize user to virtual host")
-		}
+		message := "An error while retrieving user by username and vhost"
+		a.logMongoFailure(err, query, message)
 		result = false
 	}
 
@@ -75,24 +79,25 @@ func (a *RabbitAuthService) Vhost(username string, vhost string, ip string) bool
 
 // Resource checks whether requested user has appropriate permission to requested resource.
 func (a *RabbitAuthService) Resource(username string, vhost string, resource string, name string, permission string) bool {
+	// TODO: add pattern support and check for mqtt-subscription-* queue permission
+	if resource == "queue" && strings.HasPrefix(name, "mqtt-subscription-") {
+		return true
+	}
+
 	result := true
 
 	entity := bson.M{}
 	query := bson.M{
-		"username": username,
-		"vhosts":   vhost,
-		"permissions": bson.M{
-			"resource":   resource,
-			"name":       name,
-			"permission": permission,
-		},
+		"username":       username,
+		"vhosts":         vhost,
+		"perms.resource": resource,
+		"perms.name":     name,
+		"perms.perm":     permission,
 	}
-	err := a.database.Collection("users").FindOne(nil, query).Decode(&entity)
+	err := a.database.Collection(a.collectionName).FindOne(nil, query).Decode(&entity)
 	if err != nil {
-		log.WithField("query", query).WithError(err).Debug("An error while retrieving user by username, vhost and resource permission")
-		if err != mongo.ErrNoDocuments {
-			log.WithError(err).Error("Failed to authorize user to resource")
-		}
+		message := "An error while retrieving user by username, vhost and resource permission"
+		a.logMongoFailure(err, query, message)
 		result = false
 	}
 
@@ -114,21 +119,17 @@ func (a *RabbitAuthService) Topic(username string, vhost string, resource string
 
 	entity := bson.M{}
 	query := bson.M{
-		"username": username,
-		"vhosts":   vhost,
-		"permissions": bson.M{
-			"resource":    resource,
-			"name":        name,
-			"permission":  permission,
-			"routing_key": routingKey,
-		},
+		"username":          username,
+		"vhosts":            vhost,
+		"perms.resource":    resource,
+		"perms.name":        name,
+		"perms.perm":        permission,
+		"perms.routing_key": routingKey,
 	}
-	err := a.database.Collection("users").FindOne(nil, query).Decode(&entity)
+	err := a.database.Collection(a.collectionName).FindOne(nil, query).Decode(&entity)
 	if err != nil {
-		log.WithField("query", query).WithError(err).Debug("An error while retrieving user by username, vhost and topic permission")
-		if err != mongo.ErrNoDocuments {
-			log.WithError(err).Error("Failed to authorize user to topic")
-		}
+		message := "An error while retrieving user by username, vhost and topic permission"
+		a.logMongoFailure(err, query, message)
 		result = false
 	}
 
