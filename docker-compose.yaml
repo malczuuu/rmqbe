@@ -8,3 +8,16 @@ services:
     build: .
     ports:
       - 127.0.0.1:8000:8000
+
+  rabbitmq:
+    image: rabbitmq:3.8.3-management-alpine
+    ports:
+      - 127.0.0.1:1883:1883
+      - 127.0.0.1:5672:5672
+      - 127.0.0.1:8883:8883
+      - 127.0.0.1:15672:15672
+    volumes:
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+
