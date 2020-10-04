@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.JSONFormatter{PrettyPrint: true})
+	log.SetFormatter(&log.JSONFormatter{DataKey: "params", PrettyPrint: true})
 	log.SetLevel(log.DebugLevel)
 
 	config := config.ReadConfig()
