@@ -27,3 +27,7 @@ User {
     permissions: Permission[]
 }
 ```
+
+## Tests
+
+Run `go test ./...` to run all tests.

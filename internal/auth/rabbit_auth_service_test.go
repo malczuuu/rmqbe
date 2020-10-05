@@ -3,7 +3,8 @@ package auth
 import "testing"
 
 func TestShouldMatchNameByPrefix(t *testing.T) {
-	res := matchNameByPattern("mqtt-subscription-*", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
+	res := matchNameByPattern(
+		"mqtt-subscription-*", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
 
 	if !res {
 		t.Error("matchNameByPattern(...) didn't match name with tailing *")
@@ -11,7 +12,8 @@ func TestShouldMatchNameByPrefix(t *testing.T) {
 }
 
 func TestShouldNotMatchNameBySuffix(t *testing.T) {
-	res := matchNameByPattern("*-mqtt-subscription", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
+	res := matchNameByPattern(
+		"*-mqtt-subscription", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
 
 	if res {
 		t.Error("matchNameByPattern(...) shouldn't match by suffix")
@@ -19,7 +21,8 @@ func TestShouldNotMatchNameBySuffix(t *testing.T) {
 }
 
 func TestShouldMatchNameBySuffix(t *testing.T) {
-	res := matchNameByPattern("*-mosq-eNQORgKjhUB2g2ij7Zqos1", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
+	res := matchNameByPattern(
+		"*-mosq-eNQORgKjhUB2g2ij7Zqos1", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
 
 	if !res {
 		t.Error("matchNameByPattern(...) didn't match name with heading *")
@@ -27,7 +30,8 @@ func TestShouldMatchNameBySuffix(t *testing.T) {
 }
 
 func TestShouldNotMatchNameByPrefix(t *testing.T) {
-	res := matchNameByPattern("mosq-eNQORgKjhUB2g2ij7Zqos1-*", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
+	res := matchNameByPattern(
+		"mosq-eNQORgKjhUB2g2ij7Zqos1-*", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
 
 	if res {
 		t.Error("matchNameByPattern(...) shouldn't match by prefix")
@@ -43,7 +47,8 @@ func TestShouldMatchNameInside(t *testing.T) {
 }
 
 func TestShouldNotMatchNameInside(t *testing.T) {
-	res := matchNameByPattern("*-mosq-subscription-*", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
+	res := matchNameByPattern(
+		"*-mosq-subscription-*", "mqtt-subscription-mosq-eNQORgKjhUB2g2ij7Zqos1")
 
 	if res {
 		t.Error("matchNameByPattern(...) shouldn't match both heading and tailing *")
