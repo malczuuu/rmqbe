@@ -3,10 +3,13 @@
 RabbitMQ backend for HTTP authorization plugin based on MongoDB. See
 [`rabbitmq-auth-backend-http`][1] for more details.
 
+The main purpose of this project was to learn a bit of Go programming
+language.
+
 ## Build
 
-The project uses `Makefile` to simplify build command. Just call `make` and
-project will compile into `rmqbe` binary.
+Run `go build ./cmd/rmqbe` to build the application. Binary file will
+be named `./rmqbe`.
 
 Run `go test ./...` to run all tests.
 
