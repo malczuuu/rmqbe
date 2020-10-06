@@ -1,18 +1,15 @@
 package apidoc
 
-// StructureDocs defines list of possible endpoints for RabbitMQ authorization.
 type StructureDocs struct {
 	Endpoints []EndpointDocs `json:"endpoints"`
 }
 
-// EndpointDocs defines a single endpoint for RabbitMQ authorization.
 type EndpointDocs struct {
 	Path   string   `json:"path"`
 	Params []string `json:"params"`
 	Method string   `json:"method"`
 }
 
-// GetStructure returns a representation of service API.
 func GetStructure() StructureDocs {
 	return StructureDocs{
 		Endpoints: []EndpointDocs{

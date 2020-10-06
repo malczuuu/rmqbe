@@ -13,20 +13,17 @@ import (
 
 const timeout = 2 * time.Second
 
-// NewRabbitAuthService creates new instance of RabbitAuthService.
 func NewRabbitAuthService(client *mongo.Client, config config.Config) RabbitAuthService {
 	database := client.Database("rmqbe")
 	return RabbitAuthService{client: client, database: database, collectionName: config.MongoUsersCollection}
 }
 
-// RabbitAuthService instance is the main engine of RabbitMQ authorization service.
 type RabbitAuthService struct {
 	client         *mongo.Client
 	database       *mongo.Database
 	collectionName string
 }
 
-// User checks whether requested user exists and it's password is correct.
 func (a *RabbitAuthService) User(username string, password string) bool {
 	result := false
 
@@ -60,7 +57,6 @@ func (a *RabbitAuthService) logMongoFailure(err error, query bson.M, message str
 	}
 }
 
-// Vhost checks whether requested user is a member of desired virtual host.
 func (a *RabbitAuthService) Vhost(username string, vhost string, ip string) bool {
 	result := true
 
@@ -110,7 +106,6 @@ func matchNameByPattern(ref string, value string) bool {
 	return result
 }
 
-// Resource checks whether requested user has appropriate permission to requested resource.
 func (a *RabbitAuthService) Resource(username string, vhost string, resource string, name string, permission string) bool {
 	result := true
 
@@ -156,7 +151,6 @@ func checkResourcePermission(entity bson.M, resource string, name string, permis
 	return false
 }
 
-// Topic checks whether requested user has appropriate permission to requested topic.
 func (a *RabbitAuthService) Topic(username string, vhost string, resource string, name string, permission string, routingKey string) bool {
 	result := true
 
