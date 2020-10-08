@@ -13,6 +13,8 @@ be named `./rmqbe`.
 
 Run `go test ./...` to run all tests.
 
+Run application with `./rmqbe` and browse `http://localhost:8000`.
+
 ## API
 
 | endpoint         | parameters                                                                          |
