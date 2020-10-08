@@ -11,4 +11,6 @@ ENV MONGODB_URI "mongodb://mongo:27017"
 
 COPY --from=builder /rmqbe/rmqbe /
 
+EXPOSE 8000
+
 ENTRYPOINT [ "/rmqbe" ]
