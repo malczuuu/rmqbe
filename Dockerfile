@@ -1,16 +1,27 @@
-FROM golang:1.15.2-alpine3.12 AS builder
+FROM golang:1.24-alpine AS builder
 
-WORKDIR /rmqbe
+WORKDIR /build
+
+RUN apk add --no-cache curl git
+RUN curl -sL https://taskfile.dev/install.sh | sh
+RUN ./bin/task --version
 
 COPY . .
-RUN go build ./cmd/rmqbe
+RUN ./bin/task build-prod
 
-FROM alpine:3.12.0
+FROM alpine:3.19
 
 ENV MONGODB_URI "mongodb://mongo:27017"
 
-COPY --from=builder /rmqbe/rmqbe /
+RUN apk --no-cache add ca-certificates dumb-init
+
+WORKDIR /rmqbe
+
+COPY --from=builder /build/dist/rmqbe /rmqbe
 
 EXPOSE 8000
 
-ENTRYPOINT [ "/rmqbe" ]
+# use dumb-init to handle signals properly
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["/rmqbe/rmqbe"]

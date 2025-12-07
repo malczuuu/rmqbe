@@ -1,19 +1,25 @@
 # RMQ BE
 
 RabbitMQ backend for HTTP authorization plugin based on MongoDB. See
-[`rabbitmq-auth-backend-http`][1] for more details.
+[`rabbitmq-auth-backend-http`][rabbitmq-auth-backend-http] for more details.
 
-The main purpose of this project was to learn a bit of Go programming
-language.
+The main purpose of this project was to learn a bit of Go programming language.
 
 ## Build
 
-Run `go build ./cmd/rmqbe` to build the application. Binary file will
-be named `./rmqbe`.
+It uses [Taskfile](https://taskfile.dev/docs/getting-started) tool.
 
-Run `go test ./...` to run all tests.
+```bash
+git clone https://github.com/malczuuu/rmqbe.git
+cd rmqbe
 
-Run application with `./rmqbe` and browse `http://localhost:8000`.
+task test
+task build
+
+./dist/rmqbe
+```
+
+Then browse `http://localhost:8000`.
 
 ## API
 
@@ -45,4 +51,4 @@ User {
 }
 ```
 
-[1]: https://github.com/rabbitmq/rabbitmq-auth-backend-http
+[rabbitmq-auth-backend-http]: https://github.com/rabbitmq/rabbitmq-auth-backend-http
