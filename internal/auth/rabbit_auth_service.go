@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/malczuuu/rmqbe/internal/config"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -33,27 +33,21 @@ func (a *RabbitAuthService) User(username string, password string) bool {
 	defer cancel()
 	err := a.database.Collection(a.collectionName).FindOne(ctx, query).Decode(&entity)
 	if err != nil {
-		message := "An error while retrieving user by username"
-		a.logMongoFailure(err, query, message)
+		a.logMongoFailure(err, query, "an error while retrieving user by username")
 		result = false
 	} else if entity["password"] == password {
 		result = true
 	}
 
-	log.WithFields(
-		log.Fields{
-			"username":   username,
-			"successful": result,
-		}).Info("Authenticate user by username and password")
+	log.Info().Str("username", username).Bool("successful", result).Msg("authenticate user by username and password")
 	return result
 }
 
 func (a *RabbitAuthService) logMongoFailure(err error, query bson.M, message string) {
-	preparedLog := log.WithFields(log.Fields{"query": query, "collection": a.collectionName}).WithError(err)
 	if err == mongo.ErrNoDocuments {
-		preparedLog.Debug(message)
+		log.Debug().Interface("query", query).Str("collection", a.collectionName).Err(err).Msg(message)
 	} else {
-		preparedLog.Error(message)
+		log.Error().Interface("query", query).Str("collection", a.collectionName).Err(err).Msg(message)
 	}
 }
 
@@ -66,18 +60,16 @@ func (a *RabbitAuthService) Vhost(username string, vhost string, ip string) bool
 	defer cancel()
 	err := a.database.Collection(a.collectionName).FindOne(ctx, query).Decode(&entity)
 	if err != nil {
-		message := "An error while retrieving user by username and vhost"
-		a.logMongoFailure(err, query, message)
+		a.logMongoFailure(err, query, "an error while retrieving user by username and vhost")
 		result = false
 	}
 
-	log.WithFields(
-		log.Fields{
-			"username":   username,
-			"vhost":      vhost,
-			"ip":         ip,
-			"successful": result,
-		}).Info("Authorize user to virtual host")
+	log.Info().
+		Str("username", username).
+		Str("vhost", vhost).
+		Str("ip", ip).
+		Bool("successful", result).
+		Msg("authorize user to virtual host")
 	return result
 }
 
@@ -120,20 +112,18 @@ func (a *RabbitAuthService) Resource(username string, vhost string, resource str
 	if err == nil {
 		result = checkResourcePermission(entity, resource, name, permission)
 	} else {
-		message := "An error while retrieving user by username, vhost and resource permission"
-		a.logMongoFailure(err, query, message)
+		a.logMongoFailure(err, query, "an error while retrieving user by username, vhost and resource permission")
 		result = false
 	}
 
-	log.WithFields(
-		log.Fields{
-			"username":   username,
-			"vhost":      vhost,
-			"resource":   resource,
-			"name":       name,
-			"permission": permission,
-			"successful": result,
-		}).Info("Authorize user to resource")
+	log.Info().
+		Str("username", username).
+		Str("vhost", vhost).
+		Str("resource", resource).
+		Str("name", name).
+		Str("permission", permission).
+		Bool("successful", result).
+		Msg("authorize user to resource")
 	return result
 }
 
@@ -170,16 +160,15 @@ func (a *RabbitAuthService) Topic(username string, vhost string, resource string
 		result = false
 	}
 
-	log.WithFields(
-		log.Fields{
-			"username":    username,
-			"vhost":       vhost,
-			"resource":    resource,
-			"name":        name,
-			"permission":  permission,
-			"routing_key": routingKey,
-			"successful":  result,
-		}).Info("Authorize user to topic")
+	log.Info().
+		Str("username", username).
+		Str("vhost", vhost).
+		Str("resource", resource).
+		Str("name", name).
+		Str("permission", permission).
+		Str("routing_key", routingKey).
+		Bool("successful", result).
+		Msg("authorize user to topic")
 	return result
 }
 

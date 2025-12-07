@@ -3,24 +3,26 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/malczuuu/rmqbe/internal/auth"
 	"github.com/malczuuu/rmqbe/internal/config"
 	"github.com/malczuuu/rmqbe/internal/controller"
-	log "github.com/sirupsen/logrus"
+	"github.com/malczuuu/rmqbe/internal/logging"
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	log.SetFormatter(&log.JSONFormatter{DataKey: "params", PrettyPrint: true})
-	log.SetLevel(log.DebugLevel)
-
 	config := config.ReadConfig()
+	logging.ConfigureLogger(&config)
 
-	log.WithField("config", config).Info("Starting RMQ BE")
+	log.Info().Msg("starting rmqbe service")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(config.MongoURI))
 	if err != nil {
@@ -43,7 +45,7 @@ func main() {
 
 	addr := "0.0.0.0:8000"
 
-	log.WithField("addr", addr).Info("HTTP server is being initialized")
+	log.Info().Str("addr", addr).Msg("HTTP server is being initialized")
 	router := mux.NewRouter()
 	router.HandleFunc("/", homeController.Home).Methods("GET")
 
@@ -52,12 +54,32 @@ func main() {
 	router.HandleFunc("/resource", authController.Resource).Methods("POST")
 	router.HandleFunc("/topic", authController.Topic).Methods("POST")
 
-	server := &http.Server{
+	srv := &http.Server{
 		Handler:      router,
 		Addr:         addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Fatal(server.ListenAndServe())
+	go func() {
+		log.Info().Str("addr", addr).Msg("starting server")
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msg("server exited with error")
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-quit
+
+	log.Info().Str("signal", sig.String()).Msg("commencing graceful shutdown")
+
+	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Error().Err(err).Msg("server forced to shutdown")
+	}
+
+	log.Info().Msg("graceful shutdown completed")
 }
