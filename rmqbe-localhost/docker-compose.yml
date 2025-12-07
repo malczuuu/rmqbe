@@ -1,13 +1,16 @@
-version: "3"
 services:
+  rmqbe:
+    build: ..
+    ports:
+      - 127.0.0.1:8000:8000
+    depends_on:
+      mongo:
+        condition: service_started
+
   mongo:
     image: mongo:4.2.10
     ports:
       - 127.0.0.1:27017:27017
-  rmqbe:
-    build: .
-    ports:
-      - 127.0.0.1:8000:8000
 
   rabbitmq:
     image: rabbitmq:3.8.3-management-alpine
@@ -20,4 +23,3 @@ services:
       - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
       - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-
