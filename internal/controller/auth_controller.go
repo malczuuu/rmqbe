@@ -27,7 +27,7 @@ func (c *AuthController) User(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, result)
+	fmt.Fprintf(w, "%s", result)
 }
 
 func (c *AuthController) Vhost(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +43,7 @@ func (c *AuthController) Vhost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, result)
+	fmt.Fprintf(w, "%s", result)
 }
 
 func (c *AuthController) Resource(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +61,7 @@ func (c *AuthController) Resource(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, result)
+	fmt.Fprintf(w, "%s", result)
 }
 
 func (c *AuthController) Topic(w http.ResponseWriter, r *http.Request) {
@@ -80,5 +80,5 @@ func (c *AuthController) Topic(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, result)
+	fmt.Fprintf(w, "%s", result)
 }
