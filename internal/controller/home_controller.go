@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/malczuuu/rmqbe/internal/apidoc"
 )
 
@@ -13,10 +13,7 @@ func NewHomeController() HomeController {
 
 type HomeController struct{}
 
-func (c *HomeController) Home(w http.ResponseWriter, r *http.Request) {
+func (h *HomeController) Home(c *gin.Context) {
 	docs := apidoc.GetStructure()
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(docs)
+	c.JSON(http.StatusOK, docs)
 }

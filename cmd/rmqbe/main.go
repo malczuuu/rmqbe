@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/malczuuu/rmqbe/internal/auth"
 	"github.com/malczuuu/rmqbe/internal/config"
 	"github.com/malczuuu/rmqbe/internal/controller"
@@ -41,13 +41,15 @@ func main() {
 	addr := "0.0.0.0:8000"
 
 	log.Info().Str("addr", addr).Msg("HTTP server is being initialized")
-	router := mux.NewRouter()
-	router.HandleFunc("/", homeController.Home).Methods("GET")
+	router := gin.New()
+	router.Use(gin.Recovery())
 
-	router.HandleFunc("/user", authController.User).Methods("POST")
-	router.HandleFunc("/vhost", authController.Vhost).Methods("POST")
-	router.HandleFunc("/resource", authController.Resource).Methods("POST")
-	router.HandleFunc("/topic", authController.Topic).Methods("POST")
+	router.GET("/", homeController.Home)
+
+	router.POST("/user", authController.User)
+	router.POST("/vhost", authController.Vhost)
+	router.POST("/resource", authController.Resource)
+	router.POST("/topic", authController.Topic)
 
 	srv := &http.Server{
 		Handler:      router,

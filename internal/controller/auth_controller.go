@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/malczuuu/rmqbe/internal/auth"
 )
 
@@ -15,70 +15,66 @@ type AuthController struct {
 	rabbitAuthService auth.RabbitAuthService
 }
 
-func (c *AuthController) User(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+func (a *AuthController) User(c *gin.Context) {
+	username := c.Query("username")
+	password := c.Query("password")
 
-	auth := c.rabbitAuthService.User(username, password)
+	auth := a.rabbitAuthService.User(username, password)
 
 	result := "deny"
 	if auth {
 		result = "allow"
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s", result)
+	c.String(http.StatusOK, result)
 }
 
-func (c *AuthController) Vhost(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	vhost := r.FormValue("vhost")
-	ip := r.FormValue("ip")
+func (a *AuthController) Vhost(c *gin.Context) {
+	username := c.Query("username")
+	vhost := c.Query("vhost")
+	ip := c.Query("ip")
 
-	auth := c.rabbitAuthService.Vhost(username, vhost, ip)
+	auth := a.rabbitAuthService.Vhost(username, vhost, ip)
 
 	result := "deny"
 	if auth {
 		result = "allow"
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s", result)
+	c.String(http.StatusOK, result)
 }
 
-func (c *AuthController) Resource(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	vhost := r.FormValue("vhost")
-	resource := r.FormValue("resource")
-	name := r.FormValue("name")
-	permission := r.FormValue("permission")
+func (a *AuthController) Resource(c *gin.Context) {
+	username := c.Query("username")
+	vhost := c.Query("vhost")
+	resource := c.Query("resource")
+	name := c.Query("name")
+	permission := c.Query("permission")
 
-	auth := c.rabbitAuthService.Resource(username, vhost, resource, name, permission)
+	auth := a.rabbitAuthService.Resource(username, vhost, resource, name, permission)
 
 	result := "deny"
 	if auth {
 		result = "allow"
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s", result)
+	c.String(http.StatusOK, result)
 }
 
-func (c *AuthController) Topic(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	vhost := r.FormValue("vhost")
-	resource := r.FormValue("resource")
-	name := r.FormValue("name")
-	permission := r.FormValue("permission")
-	routingKey := r.FormValue("routing_key")
+func (a *AuthController) Topic(c *gin.Context) {
+	username := c.Query("username")
+	vhost := c.Query("vhost")
+	resource := c.Query("resource")
+	name := c.Query("name")
+	permission := c.Query("permission")
+	routingKey := c.Query("routing_key")
 
-	auth := c.rabbitAuthService.Topic(username, vhost, resource, name, permission, routingKey)
+	auth := a.rabbitAuthService.Topic(username, vhost, resource, name, permission, routingKey)
 
 	result := "deny"
 	if auth {
 		result = "allow"
 	}
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s", result)
+	c.String(http.StatusOK, result)
 }
