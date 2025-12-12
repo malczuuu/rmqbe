@@ -6,11 +6,25 @@ services:
     depends_on:
       mongo:
         condition: service_started
+    networks:
+      - rmqbe
 
   mongo:
     image: mongo:8.2.2
     ports:
       - 127.0.0.1:27017:27017
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - rmqbe
+    volumes:
+      - ./mongo/01.users.initdb.js:/docker-entrypoint-initdb.d/01.users.initdb.js
+      - "mongo_data:/data/db"
+      - "mongo_config:/data/configdb"
 
   rabbitmq:
     image: rabbitmq:4.2.1-management-alpine
@@ -19,7 +33,24 @@ services:
       - 127.0.0.1:5672:5672
       - 127.0.0.1:8883:8883
       - 127.0.0.1:15672:15672
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - rmqbe
     volumes:
       - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
       - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - rabbitmq_data:/var/lib/rabbitmq
+
+networks:
+  rmqbe:
+
+volumes:
+  mongo_data:
+  mongo_config:
+  rabbitmq_data:
