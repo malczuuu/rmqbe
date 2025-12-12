@@ -1,5 +1,14 @@
 version: 2
 updates:
+  - package-ecosystem: "docker-compose"
+    directory: "/rmqbe-localhost"
+    schedule:
+      interval: "quarterly"
+    target-branch: main
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
