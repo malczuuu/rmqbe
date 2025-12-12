@@ -41,6 +41,9 @@ func main() {
 	addr := "0.0.0.0:8000"
 
 	log.Info().Str("addr", addr).Msg("HTTP server is being initialized")
+
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.New()
 	router.Use(gin.Recovery())
 

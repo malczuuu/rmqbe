@@ -16,8 +16,8 @@ type AuthController struct {
 }
 
 func (a *AuthController) User(c *gin.Context) {
-	username := c.Query("username")
-	password := c.Query("password")
+	username := c.PostForm("username")
+	password := c.PostForm("password")
 
 	auth := a.rabbitAuthService.User(username, password)
 
@@ -30,9 +30,9 @@ func (a *AuthController) User(c *gin.Context) {
 }
 
 func (a *AuthController) Vhost(c *gin.Context) {
-	username := c.Query("username")
-	vhost := c.Query("vhost")
-	ip := c.Query("ip")
+	username := c.PostForm("username")
+	vhost := c.PostForm("vhost")
+	ip := c.PostForm("ip")
 
 	auth := a.rabbitAuthService.Vhost(username, vhost, ip)
 
@@ -45,11 +45,11 @@ func (a *AuthController) Vhost(c *gin.Context) {
 }
 
 func (a *AuthController) Resource(c *gin.Context) {
-	username := c.Query("username")
-	vhost := c.Query("vhost")
-	resource := c.Query("resource")
-	name := c.Query("name")
-	permission := c.Query("permission")
+	username := c.PostForm("username")
+	vhost := c.PostForm("vhost")
+	resource := c.PostForm("resource")
+	name := c.PostForm("name")
+	permission := c.PostForm("permission")
 
 	auth := a.rabbitAuthService.Resource(username, vhost, resource, name, permission)
 
@@ -62,12 +62,12 @@ func (a *AuthController) Resource(c *gin.Context) {
 }
 
 func (a *AuthController) Topic(c *gin.Context) {
-	username := c.Query("username")
-	vhost := c.Query("vhost")
-	resource := c.Query("resource")
-	name := c.Query("name")
-	permission := c.Query("permission")
-	routingKey := c.Query("routing_key")
+	username := c.PostForm("username")
+	vhost := c.PostForm("vhost")
+	resource := c.PostForm("resource")
+	name := c.PostForm("name")
+	permission := c.PostForm("permission")
+	routingKey := c.PostForm("routing_key")
 
 	auth := a.rabbitAuthService.Topic(username, vhost, resource, name, permission, routingKey)
 

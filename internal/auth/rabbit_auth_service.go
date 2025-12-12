@@ -127,17 +127,35 @@ func (a *RabbitAuthService) Resource(username string, vhost string, resource str
 	return result
 }
 
-func checkResourcePermission(entity bson.M, resource string, name string, permission string) bool {
-	if entity["permissions"] != nil {
-		for _, v := range entity["permissions"].(bson.A) {
-			value := v.(bson.M)
-			if value["resource"] == resource &&
-				matchNameByPattern(value["name"].(string), name) &&
-				value["permission"] == permission {
-				return true
-			}
+func dToM(d bson.D) bson.M {
+	m := bson.M{}
+	for _, elem := range d {
+		m[elem.Key] = elem.Value
+	}
+	return m
+}
+
+func checkResourcePermission(entity bson.M, resource, name, permission string) bool {
+	perms, ok := entity["permissions"].(bson.A)
+	if !ok {
+		return false
+	}
+
+	for _, v := range perms {
+		doc, ok := v.(bson.D)
+		if !ok {
+			continue
+		}
+
+		value := dToM(doc)
+
+		if value["resource"] == resource &&
+			matchNameByPattern(value["name"].(string), name) &&
+			value["permission"] == permission {
+			return true
 		}
 	}
+
 	return false
 }
 
@@ -172,17 +190,26 @@ func (a *RabbitAuthService) Topic(username string, vhost string, resource string
 	return result
 }
 
-func checkTopicPermission(entity bson.M, resource string, name string, permission string, routingKey string) bool {
-	if entity["permissions"] != nil {
-		for _, v := range entity["permissions"].(bson.A) {
-			value := v.(bson.M)
-			if value["resource"] == resource &&
-				matchNameByPattern(value["name"].(string), name) &&
-				value["permission"] == permission &&
-				value["routing_key"] == routingKey {
-				return true
-			}
+func checkTopicPermission(entity bson.M, resource, name, permission, routingKey string) bool {
+	perms, ok := entity["permissions"].(bson.A)
+	if !ok {
+		return false
+	}
+
+	for _, v := range perms {
+		doc, ok := v.(bson.D)
+		if !ok {
+			continue
+		}
+		value := dToM(doc)
+
+		if value["resource"] == resource &&
+			matchNameByPattern(value["name"].(string), name) &&
+			value["permission"] == permission &&
+			value["routing_key"] == routingKey {
+			return true
 		}
 	}
+
 	return false
 }
