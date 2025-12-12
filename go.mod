@@ -3,7 +3,7 @@ module github.com/malczuuu/rmqbe
 go 1.24.0
 
 require (
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/viper v1.21.0
 	go.mongodb.org/mongo-driver v1.5.1
