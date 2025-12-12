@@ -19,7 +19,7 @@ tasks:
     desc: Build application
     cmds:
       - task: clean
-      - go build -o ./dist/ ./cmd/failbook
+      - go build -o ./dist/ ./cmd/rmqbe
 
   # builds a fully static Linux binary of Go application
   # - CGO_ENABLED=0 disables CGO for full static linking

@@ -14,8 +14,8 @@ import (
 	"github.com/malczuuu/rmqbe/internal/controller"
 	"github.com/malczuuu/rmqbe/internal/logging"
 	"github.com/rs/zerolog/log"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 func main() {
@@ -24,14 +24,9 @@ func main() {
 
 	log.Info().Msg("starting rmqbe service")
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(config.MongoURI))
-	if err != nil {
-		panic(err)
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	err = client.Connect(ctx)
+	client, err := mongo.Connect(options.Client().ApplyURI(config.MongoURI))
 	if err != nil {
 		panic(err)
 	}
