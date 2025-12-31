@@ -27,7 +27,7 @@ services:
       - "mongo_config:/data/configdb"
 
   rabbitmq:
-    image: rabbitmq:4.2.1-management-alpine
+    image: rabbitmq:4.2.2-management-alpine
     ports:
       - 127.0.0.1:1883:1883
       - 127.0.0.1:5672:5672
