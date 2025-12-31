@@ -10,7 +10,7 @@ services:
       - rmqbe
 
   mongo:
-    image: mongo:8.2.2
+    image: mongo:8.2.3
     ports:
       - 127.0.0.1:27017:27017
     healthcheck:
